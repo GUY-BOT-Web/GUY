@@ -49,6 +49,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-bottom: 10px;
         }
         .button:hover {
             background-color: #0056b3;
@@ -62,6 +63,7 @@
     <main>
         <h2>Control Panel</h2>
         <button class="button" onclick="sendMessageToWebhook()">Send Message to Webhook</button>
+        <button class="button" onclick="authorizeWithDiscord()">Authorize with Discord</button>
     </main>
     <footer>
         <p>&copy; 2024 GUY Dashboard</p>
@@ -95,6 +97,10 @@
             } else {
                 alert("Message cannot be empty. Please enter a valid message.");
             }
+        }
+
+        function authorizeWithDiscord() {
+            window.location.href = "https://discord.com/oauth2/authorize?client_id=1221440545197396119&response_type=code&redirect_uri=https%3A%2F%2Fguy-bot-web.github.io%2FGUY%2F&scope=guilds+email+identify";
         }
     </script>
 </body>

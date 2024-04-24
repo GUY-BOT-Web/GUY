@@ -11,8 +11,9 @@
             padding: 0;
             background-color: #f8f9fa;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
         }
         header {
@@ -22,12 +23,14 @@
             text-align: center;
             border-radius: 10px 10px 0 0;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
         main {
             padding: 20px;
             background-color: #fff;
             border-radius: 0 0 10px 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
         footer {
             background-color: #343a40;
@@ -36,9 +39,9 @@
             text-align: center;
             border-radius: 0 0 10px 10px;
             box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
             position: fixed;
             bottom: 0;
-            width: 100%;
         }
         .button {
             padding: 10px 20px;
@@ -49,9 +52,13 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-bottom: 10px;
         }
         .button:hover {
             background-color: #0056b3;
+        }
+        .user-info {
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -60,42 +67,123 @@
         <h1>GUY Dashboard</h1>
     </header>
     <main>
-        <h2>Control Panel</h2>
-        <button class="button" onclick="sendMessageToWebhook()">Send Message to Webhook</button>
+        <div class="user-info" id="user-info"></div>
+        <button class="button" id="authorize-button" onclick="authorizeWithDiscord()">Authorize with Discord</button>
+        <button class="button" id="send-message-button" onclick="sendMessageToWebhook()">Send Message to Webhook</button>
+        <button class="button" id="logout-button" onclick="logout()">Logout</button>
     </main>
     <footer>
         <p>&copy; 2024 GUY Dashboard</p>
     </footer>
 
     <script>
+        var accessToken;
+
+        function authorizeWithDiscord() {
+            window.location.href = "https://discord.com/oauth2/authorize?client_id=1221440545197396119&response_type=code&redirect_uri=https%3A%2F%2Fguy-bot-web.github.io%2FGUY%2F&scope=guilds+email+identify";
+        }
+
+        function fetchUserInfo() {
+            var userUrl = "https://discord.com/api/users/@me";
+
+            fetch(userUrl, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById("user-info").innerHTML = `
+                    <h3>User Information</h3>
+                    <p>Username: ${user.username}</p>
+                    <p>Email: ${user.email}</p>
+                    <p>User ID: ${user.id}</p>
+                `;
+            })
+            .catch(error => {
+                console.error("Error fetching user data:", error);
+                alert("Failed to fetch user data.");
+            });
+        }
+
         function sendMessageToWebhook() {
             var message = prompt("Enter the message to send to the webhook:");
             if (message !== null && message.trim() !== "") {
                 var webhookUrl = "https://discord.com/api/webhooks/1232637259044360212/KB8nxYCQv5_JkRWYMEmE3ja7q5ZP_bbWT9l_SB8IgrXh_ev_AC0eVFBexEn4Ie440vVr";
 
                 var payload = {
-                    content: "Sent using the website : " + message
+                    content: message
                 };
 
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", webhookUrl);
-                xhr.setRequestHeader("Content-Type", "application/json");
-
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            alert("Message sent successfully to the webhook!");
-                        } else {
-                            alert("Failed to send message to the webhook. Please try again later.");
-                        }
+                fetch(webhookUrl, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    headers: {
+                        "Content-Type": "application/json"
                     }
-                };
-
-                xhr.send(JSON.stringify(payload));
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Message sent successfully to the webhook!");
+                    } else {
+                        alert("Failed to send message to the webhook. Please try again later.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error sending message to webhook:", error);
+                    alert("Failed to send message to the webhook. Please try again later.");
+                });
             } else {
                 alert("Message cannot be empty. Please enter a valid message.");
             }
         }
+
+        function logout() {
+            accessToken = null;
+            document.getElementById("user-info").innerHTML = "";
+            document.getElementById("authorize-button").style.display = "block";
+            document.getElementById("send-message-button").style.display = "none";
+            document.getElementById("logout-button").style.display = "none";
+        }
+
+        // Function to handle OAuth2 callback
+        function handleOAuthCallback() {
+            var code = new URLSearchParams(window.location.search).get("code");
+            if (code) {
+                // Exchange code for access token
+                var tokenUrl = "https://discord.com/api/oauth2/token";
+                var params = {
+                    client_id: "1221440545197396119",
+                    client_secret: "A81tw_c6Jm2Fc8C5DZoYhU6xXDHmhsJj",
+                    grant_type: "authorization_code",
+                    code: code,
+                    redirect_uri: "https://guy-bot-web.github.io/GUY/"
+                };
+
+                fetch(tokenUrl, {
+                    method: "POST",
+                    body: new URLSearchParams(params),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    accessToken = data.access_token;
+                    fetchUserInfo();
+                    document.getElementById("authorize-button").style.display = "none";
+                    document.getElementById("send-message-button").style.display = "block";
+                    document.getElementById("logout-button").style.display = "block";
+                })
+                .catch(error => {
+                    console.error("Error exchanging code for access token:", error);
+                    alert("Failed to exchange code for access token.");
+                });
+            }
+        }
+
+        // Call handleOAuthCallback() on page load to handle OAuth2 callback
+        handleOAuthCallback();
     </script>
 </body>
 </html>

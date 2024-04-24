@@ -37,6 +37,9 @@
     </footer>
 
     <script>
+        // Bot invite link
+        const botInviteLink = "https://discord.com/oauth2/authorize?client_id=1221440545197396119";
+
         // Function to fetch server information and populate server list
         function fetchServerInfo() {
             fetch("https://discord.com/api/users/@me/guilds", {
@@ -77,18 +80,14 @@
 
         // Function to invite bot to a server
         function inviteBot(serverId) {
-            // Logic to generate invite link and redirect user to invite page
-            // Example:
-            // window.location.href = `https://discord.com/oauth2/authorize?client_id=${clientId}&scope=bot&permissions=${permissions}&guild_id=${serverId}`;
-            alert("Implement invite bot logic here.");
+            window.location.href = `${botInviteLink}&guild_id=${serverId}`;
         }
 
         // Function to open server dashboard
         function openServerDashboard(serverId) {
             // Logic to navigate to server dashboard
-            // Example:
-            // window.location.href = `/server/${serverId}`;
-            alert("Implement open server dashboard logic here.");
+            // Replace the following line with your actual navigation logic
+            alert(`Navigating to server dashboard for server ID: ${serverId}`);
         }
 
         // Call fetchServerInfo() on page load to populate server list

@@ -140,46 +140,42 @@
         }
 
         function sendDataToBot() {
-    // Ask the user to choose an option
-    var option = prompt("Choose an option:\n1. Send info\n2. Send custom");
+            var option = prompt("Choose an option:\n1. Send user information\n2. Send custom message");
 
-    // Process the chosen option
-    if (option === "1") {
-        // Option 1: Send user information
-        fetchUserInfo();
-    } else if (option === "2") {
-        // Option 2: Send custom message
-        var message = prompt("Enter the custom message to send:");
-        if (message !== null && message.trim() !== "") {
-            var data = {
-                message: message
-            };
+            if (option === "1") {
+                fetchUserInfo();
+            } else if (option === "2") {
+                var customMessage = prompt("Enter the custom message to send:");
+                if (customMessage !== null && customMessage.trim() !== "") {
+                    var data = {
+                        message: customMessage
+                    };
 
-            fetch("http://127.0.0.1:5000", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log("Data sent successfully to the bot.");
+                    fetch("http://127.0.0.1:5000", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log("Data sent successfully to the bot.");
+                        } else {
+                            console.error("Failed to send data to the bot.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error sending data to the bot:", error);
+                    });
                 } else {
-                    console.error("Failed to send data to the bot.");
+                    alert("Message cannot be empty. Please enter a valid message.");
                 }
-            })
-            .catch(error => {
-                console.error("Error sending data to the bot:", error);
-            });
-        } else {
-            alert("Message cannot be empty. Please enter a valid message.");
+            } else {
+                alert("Invalid option. Please choose either 1 or 2.");
+            }
         }
-    } else {
-        // Invalid option
-        alert("Invalid option. Please choose either 1 or 2.");
-    }
-}
+
         function logout() {
             accessToken = null;
             document.getElementById("user-info").innerHTML = "";
@@ -188,7 +184,6 @@
             document.getElementById("logout-button").style.display = "none";
         }
 
-        // Function to handle OAuth2 callback
         function handleOAuthCallback() {
             var code = new URLSearchParams(window.location.search).get("code");
             if (code) {
@@ -224,7 +219,6 @@
             }
         }
 
-        // Call handleOAuthCallback() on page load to handle OAuth2 callback
         handleOAuthCallback();
     </script>
 </body>

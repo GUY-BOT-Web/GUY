@@ -71,6 +71,7 @@
         <button class="button" id="authorize-button" onclick="authorizeWithDiscord()">Authorize with Discord</button>
         <button class="button" id="send-message-button" onclick="sendMessageToWebhook()">Send Message to Webhook</button>
         <button class="button" id="logout-button" onclick="logout()">Logout</button>
+        <button class="button" id="send-to-bot-button" onclick="sendDataToBot()">Send Data to Bot</button>
     </main>
     <footer>
         <p>&copy; 2024 GUY Dashboard</p>
@@ -136,6 +137,30 @@
             } else {
                 alert("Message cannot be empty. Please enter a valid message.");
             }
+        }
+
+        function sendDataToBot() {
+            var data = {
+                message: "Hello from the website!"
+            };
+
+            fetch("http://your-bot-server/webhook", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Data sent successfully to the bot.");
+                } else {
+                    console.error("Failed to send data to the bot.");
+                }
+            })
+            .catch(error => {
+                console.error("Error sending data to the bot:", error);
+            });
         }
 
         function logout() {
